@@ -1,6 +1,36 @@
 <div class="modal-backdrop" (click)="onClose()"></div>
 <div class="modal-content">
-    <h2>Sign In</h2>
-    <!-- Sign in form here -->
-    <button (click)="onClose()">Close</button>
+    <div class="container">
+        <div class="title__container">
+            <div class="title">Sign In</div>
+        </div>
+        <div class="form__container">
+            <div class="form__group">
+                <input type="input" class="form__field" placeholder="Email" name="email" id='email' required />
+                <label for="email" class="form__label">Email</label>
+            </div>
+            <div class="form__group">
+                <input type="input" class="form__field" placeholder="Password" name="password" id='password' required />
+                <label for="password" class="form__label">Password</label>
+            </div>
+            <div class="entry-link" style="align-self: flex-end; margin-bottom: 20px;">Forgot password?</div>
+        </div>
+        <div class="button__container">
+            <div style="display: flex; flex-direction: column; justify-content: space-between; max-height: 150px; min-height: 100px; flex-grow: 1;">
+                <div class="button button__default" (click)="onClose()">
+                    <span>Sign in</span>
+                </div>
+                <div class="button button__google" (click)="onClose()">
+                    <span>Sign in with Google</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer__container">
+             <div class="footer">
+                <div class="entry-link">
+                    Don't have an account?&nbsp;<span class="register-text">Register</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
