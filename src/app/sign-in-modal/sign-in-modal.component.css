@@ -34,6 +34,7 @@ $gray: #9b9b9b; */
     width: 100%;
     /* background-color: pink; */
     margin-bottom: 20px;
+    height: 38px;
 }
 
 .form__field {
@@ -121,8 +122,6 @@ body {
 }
 
 .entry-link {
-    display: flex;
-    align-self: center;
     font-size: 0.75rem;
     font-weight: 500;
 }
@@ -185,7 +184,7 @@ body {
 
 .title__container {
     display: flex;
-    flex-grow: 40;
+    flex-grow: 30;
     align-items: center;
 }
 
@@ -193,7 +192,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    flex-grow: 20;
+    flex-grow: 30;
 }
 
 .button__container {

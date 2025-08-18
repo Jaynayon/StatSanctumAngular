@@ -5,18 +5,23 @@
             <div class="title">{{title}}</div>
         </div>
         <div class="form__container">
-            <div class="form__group">
-                <input [formControl]="emailControl" type="input" class="form__field" placeholder="Email" name="email"
-                    id='email' required />
-                <label for="email" class="form__label">Email</label>
-            </div>
-            <div class="form__group">
-                <input [formControl]="passwordControl" type="password" class="form__field" placeholder="Password"
-                    name="password" id='password' required />
-                <label for="password" class="form__label">Password</label>
-            </div>
-            <div class="entry-link" style="align-self: flex-end; margin-bottom: 20px;" (click)="onForgotPress($event)">
-                Forgot password?</div>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <div class="form__group" style="margin-bottom: 15px;">
+                    <input formControlName="email" type="input" class="form__field" placeholder="Email" name="email"
+                        id='email' required />
+                    <label for="email" class="form__label">Email</label>
+                </div>
+                <div class="form__group">
+                    <input formControlName="password" type="password" class="form__field" placeholder="Password"
+                        name="password" id='password' required />
+                    <label for="password" class="form__label">Password</label>
+                </div>
+                <div style="display: flex; justify-content: flex-end;">
+                    <div class="entry-link" (click)="onForgotPress($event)">
+                        Forgot password?
+                    </div>
+                </div>
+            </form>
         </div>
         <div class="button__container">
             <div

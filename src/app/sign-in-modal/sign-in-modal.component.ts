@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -13,8 +13,13 @@ import { AuthService } from '../services/auth.service';
 export class SignInModalComponent {
   @Output() close = new EventEmitter<void>();
 
-  emailControl = new FormControl('');
-  passwordControl = new FormControl('');
+  loginForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required])
+  });
+
+  isLoading = false;
+  errorMessage: string | null = null;
 
   forgotPassword = false;
   signUp = false;
@@ -48,25 +53,32 @@ export class SignInModalComponent {
   }
 
   onSubmit() {
+    if (this.loginForm.invalid) return;
+
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    const { email, password } = this.loginForm.value;
+
     if (this.signUp) {
       console.log("Query for signing up");
     } else {
       console.log("Query for signing in");
-      this.authService.login(this.emailControl.value!, this.passwordControl.value!).subscribe({
+      this.authService.login(email!, password!).subscribe({
         next: (response) => {
           console.log('Login successful', response);
-          // this.isLoading = false;
+          this.isLoading = false;
           // Handle successful login (redirect, store token, etc.)
         },
         error: (error) => {
           console.error('Login failed', error);
-          // this.isLoading = false;
-          // this.errorMessage = error.error?.message || 'Login failed';
+          this.isLoading = false;
+          this.errorMessage = error.error?.message || 'Login failed';
         }
       })
     }
-    console.log(this.emailControl.value);
-    console.log(this.passwordControl.value);
+    console.log(email);
+    console.log(password);
   }
 
   onClose() {
