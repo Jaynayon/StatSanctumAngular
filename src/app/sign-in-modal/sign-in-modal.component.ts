@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
+import { Subscription, take } from 'rxjs';
 
 @Component({
   selector: 'app-sign-in-modal',
@@ -12,6 +13,8 @@ import { AuthService } from '../services/auth.service';
 })
 export class SignInModalComponent {
   @Output() close = new EventEmitter<void>();
+
+  private loginSubscription?: Subscription;
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -60,25 +63,50 @@ export class SignInModalComponent {
 
     const { email, password } = this.loginForm.value;
 
+    if (!email || !password) {
+      this.errorMessage = 'Email and password are required';
+      this.isLoading = false;
+      return;
+    }
+
     if (this.signUp) {
-      console.log("Query for signing up");
+      this.handleSignUp();
     } else {
-      console.log("Query for signing in");
-      this.authService.login(email!, password!).subscribe({
-        next: (response) => {
-          console.log('Login successful', response);
+      this.handleLogin(email, password);
+    }
+  }
+
+  private handleLogin(email: string, password: string) {
+    // Using take(1) to auto-unsubscribe after first emission
+    this.authService.login({ username: email, password })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
           this.isLoading = false;
-          // Handle successful login (redirect, store token, etc.)
+          // Login successful - authService already handles navigation
         },
         error: (error) => {
-          console.error('Login failed', error);
           this.isLoading = false;
-          this.errorMessage = error.error?.message || 'Login failed';
+          this.errorMessage = this.getErrorMessage(error);
         }
-      })
-    }
-    console.log(email);
-    console.log(password);
+      });
+  }
+
+  private handleSignUp() {
+    console.log("Sign up logic would go here");
+    this.isLoading = false;
+    // Implement similar pattern for signup
+  }
+
+  private getErrorMessage(error: any): string {
+    return error.error?.message
+      || error.message
+      || 'Login failed. Please check your credentials.';
+  }
+
+  ngOnDestroy() {
+    // Clean up any existing subscription
+    this.loginSubscription?.unsubscribe();
   }
 
   onClose() {
