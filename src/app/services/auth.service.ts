@@ -56,6 +56,18 @@ export class AuthService {
       );
   }
 
+  // Google
+  loginGoogle(): Observable<void> {
+    return this.http.get<void>(`${this.API_URL}/auth/google`, { withCredentials: true })
+      .pipe(
+        tap(() => { // tap() operator only runs when the request succeeds
+          this.isAuthenticatedSubject.next(true);
+          this.router.navigate(['/dashboard']);
+        })
+      );
+  }
+
+
   isAuthenticated$(): Observable<boolean> {
     return this.isAuthenticatedSubject.asObservable();
   }

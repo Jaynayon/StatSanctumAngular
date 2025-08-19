@@ -76,6 +76,115 @@ export class SignInModalComponent {
     }
   }
 
+
+  private googleAuthWindow: Window | null = null;
+  private cookieCheckInterval: any;
+
+  onGoogleSubmit() {
+    // Clear any existing interval
+    if (this.cookieCheckInterval) {
+      clearInterval(this.cookieCheckInterval);
+    }
+
+    // Open a new minimized window for Google OAuth
+    this.googleAuthWindow = window.open(
+      'https://localhost:7294/auth/google', // URL will be set by your backend
+      'GoogleAuth',
+      'width=500,height=550,left=10000,top=10000'
+    );
+
+    // Start checking for the cookie
+    this.startCookieCheck();
+
+    // if (this.signUp) {
+    //   this.handleGoogleSignUp();
+    // } else {
+    //   this.handleGoogleLogin();
+    // }
+  }
+
+  private startCookieCheck() {
+    let checkCount = 0;
+    const maxChecks = 100; // 20 seconds total (500ms * 40)
+
+    this.cookieCheckInterval = setInterval(() => {
+      checkCount++;
+      console.log(`Checking for auth (attempt ${checkCount})`);
+
+      // 1. First check if popup was closed by user
+      if (this.googleAuthWindow?.closed) {
+        console.log('Popup was already closed by user');
+        clearInterval(this.cookieCheckInterval);
+        return;
+      }
+
+      // 2. Check for auth cookie
+      if (this.hasAuthCookie()) {
+        console.log('Auth cookie found - closing popup');
+        this.googleAuthWindow?.close(); // This DOES work if same-origin
+        clearInterval(this.cookieCheckInterval);
+        this.handleSuccessfulAuth();
+        return;
+      }
+
+      // 3. Stop checking after max attempts
+      if (checkCount >= maxChecks) {
+        console.warn('Reached maximum auth checks');
+        clearInterval(this.cookieCheckInterval);
+        this.googleAuthWindow?.close();
+      }
+    }, 500);
+  }
+
+  private hasAuthCookie(): boolean {
+    return document.cookie.split(';').some(item =>
+      item.trim().startsWith('.AspNetCore.Cookies=')
+    );
+  }
+
+  private handleSuccessfulAuth() {
+    // Your post-auth logic here
+    console.log('Authentication successful');
+  }
+
+  // private hasAuthCookie(): boolean {
+  //   // Check if the ASP.NET Core auth cookie exists
+  //   return document.cookie.split(';').some((item) => {
+  //     return item.trim().startsWith('.AspNetCore.Cookies');
+  //   });
+  // }
+
+  // private handleSuccessfulAuth() {
+  //   // Clean up the interval
+  //   clearInterval(this.cookieCheckInterval);
+
+  //   // Close the popup if it's still open
+  //   if (this.googleAuthWindow && !this.googleAuthWindow.closed) {
+  //     this.googleAuthWindow.close();
+  //   }
+
+  //   // Handle any post-login logic
+  //   console.log('User authenticated successfully');
+  //   // You might want to redirect or refresh user data here
+  // }
+
+
+
+
+
+
+
+
+
+
+  private handleGoogleSignUp() {
+    console.log("Google sign up invoked")
+  }
+
+  private handleGoogleLogin() {
+    console.log("Google login invoked")
+  }
+
   private handleLogin(email: string, password: string) {
     // Using take(1) to auto-unsubscribe after first emission
     this.authService.login({ username: email, password })
@@ -107,6 +216,10 @@ export class SignInModalComponent {
   ngOnDestroy() {
     // Clean up any existing subscription
     this.loginSubscription?.unsubscribe();
+
+    if (this.cookieCheckInterval) {
+      clearInterval(this.cookieCheckInterval);
+    }
   }
 
   onClose() {
